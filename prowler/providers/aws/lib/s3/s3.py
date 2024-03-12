@@ -36,7 +36,14 @@ def send_to_s3_bucket(
         object_name = bucket_directory + "/" + output_mode + "/" + filename
 
         s3_client = audit_session.client("s3")
-        s3_client.upload_file(file_name, output_bucket_name, object_name)
+
+        extra_args = {}
+        if filename.endswith('.html'):
+            extra_args['ContentType'] = 'text/html'
+        elif filename.endswith('.pdf'):
+            extra_args['ContentType'] = 'application/pdf'
+
+        s3_client.upload_file(file_name, output_bucket_name, object_name, ExtraArgs=extra_args)
 
     except Exception as error:
         logger.error(
